@@ -10,6 +10,20 @@ This framework enables OpenClaw agents to:
 - **Detect session boundaries** - know when to flush and start fresh
 - **Never lose real learnings** - only conversational fluff gets pruned
 
+## Skills
+
+| Skill | Description |
+|-------|-------------|
+| `qmd/` | QMD semantic search integration |
+| `plane/` | Plane project management API integration |
+
+## Products
+
+| Product | Description |
+|---------|-------------|
+| `telegram-payments-test/` | Telegram payments testing |
+| `plane-mini-app/` | Telegram Mini App for Plane |
+
 ## Quick Start
 
 1. **Initialize git** in your agent workspace
