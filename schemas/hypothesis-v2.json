@@ -1,0 +1,333 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-framework.local/schemas/hypothesis-v2.json",
+  "title": "Self-Improvement Hypothesis v2.0",
+  "description": "Schema for validating self-improvement hypotheses in the Level 7 Agent Architecture",
+  "type": "object",
+  "required": [
+    "hypothesis_id",
+    "created",
+    "version",
+    "source",
+    "proposed_change",
+    "predicted_outcome",
+    "safety_assessment",
+    "test_plan"
+  ],
+  "properties": {
+    "hypothesis_id": {
+      "type": "string",
+      "pattern": "^H-[A-Z]{3}-\\d{8}-\\d{3}$",
+      "description": "Unique identifier following H-TYPE-YYYYMMDD-NNN format"
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of hypothesis creation"
+    },
+    "version": {
+      "type": "string",
+      "enum": ["2.0.0"],
+      "description": "Template version for compatibility"
+    },
+    "ohea_phase": {
+      "type": "string",
+      "enum": ["hypothesize", "experiment", "analyze"],
+      "description": "Current phase in OHEA cycle"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "proposed", "under_review", "approved", "testing", "analyzing", "accepted", "rejected", "rollback"],
+      "description": "Current status of the hypothesis"
+    },
+    "source": {
+      "type": "object",
+      "required": ["pattern_id", "observation_ids", "confidence"],
+      "properties": {
+        "pattern_id": {
+          "type": "string",
+          "pattern": "^PAT-\\d{4}-\\d{2}-\\d{2}-\\d{3}$",
+          "description": "ID of the source pattern"
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^OBS-\\d{8}-\\d{4}$"
+          },
+          "minItems": 1,
+          "description": "List of observation IDs supporting this hypothesis"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Confidence score from pattern extraction (0.0-1.0)"
+        },
+        "extracted_by": {
+          "type": "string",
+          "description": "Tool or agent that extracted this hypothesis"
+        },
+        "extraction_date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the hypothesis was extracted"
+        }
+      }
+    },
+    "proposed_change": {
+      "type": "object",
+      "required": ["type", "scope", "description", "affected_files"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["workflow", "behavior", "memory", "communication", "optimization", "tool", "definition"],
+          "description": "Category of change being proposed"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["speed", "accuracy", "reliability", "safety", "optimization", "workflow"],
+          "description": "Secondary categorization"
+        },
+        "scope": {
+          "type": "string",
+          "enum": ["single_task", "task_type", "agent_definition", "all_tasks", "global"],
+          "description": "Scope of impact"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Clear description of proposed change"
+        },
+        "affected_files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Files that will be modified"
+        },
+        "implementation_steps": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Ordered steps to implement"
+        }
+      }
+    },
+    "predicted_outcome": {
+      "type": "object",
+      "required": ["metric", "current_baseline", "predicted_value", "improvement_percent", "confidence"],
+      "properties": {
+        "metric": {
+          "type": "string",
+          "description": "Name of metric to improve"
+        },
+        "metric_type": {
+          "type": "string",
+          "enum": ["duration", "count", "percentage", "ratio", "score"],
+          "description": "Type of metric"
+        },
+        "current_baseline": {
+          "type": "number",
+          "description": "Current measured value"
+        },
+        "predicted_value": {
+          "type": "number",
+          "description": "Expected value after change"
+        },
+        "improvement_percent": {
+          "type": "number",
+          "description": "Expected percentage improvement"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Confidence in prediction (0.0-1.0)"
+        },
+        "prediction_method": {
+          "type": "string",
+          "enum": ["historical_trend", "extrapolation", "expert_estimate", "simulation"],
+          "description": "How prediction was derived"
+        }
+      }
+    },
+    "safety_assessment": {
+      "type": "object",
+      "required": ["constitutional_check", "risk_level", "human_approval_required"],
+      "properties": {
+        "constitutional_check": {
+          "type": "object",
+          "required": ["helpfulness", "honesty", "safety", "alignment"],
+          "properties": {
+            "helpfulness": {
+              "type": "string",
+              "enum": ["pass", "fail", "pending"]
+            },
+            "honesty": {
+              "type": "string",
+              "enum": ["pass", "fail", "pending"]
+            },
+            "safety": {
+              "type": "string",
+              "enum": ["pass", "fail", "pending"]
+            },
+            "alignment": {
+              "type": "string",
+              "enum": ["pass", "fail", "pending"]
+            }
+          }
+        },
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "description": "MANDATORY: Risk assessment"
+        },
+        "reversibility": {
+          "type": "string",
+          "enum": ["easy", "moderate", "difficult", "irreversible"],
+          "description": "How easy to undo"
+        },
+        "human_approval_required": {
+          "type": "boolean",
+          "description": "Whether human approval is needed"
+        },
+        "rollback_plan": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Steps to revert if needed"
+        },
+        "safety_notes": {
+          "type": "string",
+          "description": "Additional safety considerations"
+        }
+      }
+    },
+    "test_plan": {
+      "type": "object",
+      "required": ["method", "duration_days", "success_criteria", "failure_criteria"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["shadow", "canary", "gradual", "human_approval", "simulation"],
+          "description": "Testing methodology"
+        },
+        "duration_days": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Test duration in days"
+        },
+        "control_group": {
+          "type": "object",
+          "properties": {
+            "size": { "type": "integer", "minimum": 1 },
+            "description": { "type": "string" },
+            "selection_criteria": { "type": "string" }
+          }
+        },
+        "experiment_group": {
+          "type": "object",
+          "properties": {
+            "size": { "type": "integer", "minimum": 1 },
+            "description": { "type": "string" },
+            "selection_criteria": { "type": "string" }
+          }
+        },
+        "success_criteria": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Criteria for acceptance"
+        },
+        "failure_criteria": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Criteria for rejection/rollback"
+        },
+        "metrics_to_track": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Additional metrics to monitor"
+        },
+        "stopping_conditions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Early stopping conditions"
+        }
+      }
+    },
+    "results": {
+      "type": "object",
+      "properties": {
+        "started": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "completed": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "control_metrics": {
+          "type": "object"
+        },
+        "experiment_metrics": {
+          "type": "object"
+        },
+        "actual_improvement_percent": {
+          "type": ["number", "null"]
+        },
+        "statistical_significance": {
+          "type": ["number", "null"],
+          "description": "P-value or confidence level"
+        },
+        "confidence_interval": {
+          "type": ["array", "null"],
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "decision": {
+          "type": ["string", "null"],
+          "enum": ["accepted", "rejected", "extend_test", null]
+        },
+        "decision_rationale": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "properties": {
+        "triggered": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "restored_to": {
+          "type": "string"
+        },
+        "rollback_date": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "evolution": {
+      "type": "object",
+      "properties": {
+        "principle_id": {
+          "type": ["string", "null"],
+          "pattern": "^PRIN-\\d{4}-\\d{2}-\\d{2}-\\d{3}$"
+        },
+        "incorporated_into": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "related_hypotheses": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}
